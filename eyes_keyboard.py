@@ -5,11 +5,13 @@ from scipy.spatial import distance as dist
 import imutils
 import dlib
 import cv2
+from utils import *
 
 
 # References :
 # https://pyimagesearch.com/2017/04/10/detect-eyes-nose-lips-jaw-dlib-opencv-python/
 # https://pyimagesearch.com/2017/04/24/eye-blink-detection-opencv-python-dlib/
+# https://datatofish.com/control-keyboard-python/
 
 
 
@@ -110,16 +112,28 @@ def closed_eyes(eyes_shape, thresh=0.3):
 
 
 if __name__ == "__main__":
-	file_path = 'image.jpg'
-	vid = cv2.VideoCapture(1)
-	vid.set(cv2.CAP_PROP_FPS, 30)
-	while True:
-		# image = cv2.imread(file_path)
-		ret, image = vid.read()
-		eyes_shape = eyes_detection(image)
-		print(closed_eyes(eyes_shape))
-		cv2.imshow('Image', image)
-		sleep(1)
-		if cv2.waitKey(1) & 0xFF == ord('q'):
-			break
+	# file_path = 'image.jpg'
+	# vs = cv2.VideoCapture(1)
+	vs = VideoStream(src=0).start()
+	sc = Screen()
+	s = 'abcdef'
+	i = 0
+	try:
+		while True:
+			# image = cv2.imread(file_path)
+			image = vs.read()
+			eyes_shape = eyes_detection(image)
+			# cv2.putText(image, s[i], (10, 50), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0, 0, 255), 2)
+			# cv2.imshow('Image', image)
+			# sleep(1)
+			if closed_eyes(eyes_shape):
+				print(s[i])
+			i += 1
+			# sleep(1)
+			if cv2.waitKey(1) & 0xFF == ord('q'):
+				break
+			if i == len(s):
+				i = 0
+	finally:
+		vs.stop()
 
