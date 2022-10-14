@@ -8,6 +8,7 @@ import cv2
 from utils import *
 import pyautogui
 import subprocess as sp
+import winsound
 
 
 # References :
@@ -116,9 +117,12 @@ frame = np.array((0, ))
 
 
 if __name__ == "__main__":
+	# For beep sound
+	frequency = 500  # Set Frequency To 2500 Hertz
+	duration = 1000  # Set Duration To 1000 ms == 1 second
 
 	# Camera ID
-	cam = 1
+	cam = 0
 	# Start stream reader thread
 	vs = VideoStream(src=cam).start()
 	s = ALPHABET # From utils
@@ -145,6 +149,7 @@ if __name__ == "__main__":
 			# Check if caracter selected
 			if closed_eyes(eyes_shape, thresh):
 				# print(s[i])
+				winsound.Beep(frequency, duration)
 				pyautogui.write(s[i]) # , interval = 0.5)
 			i += 1
 			if i == len(s):
