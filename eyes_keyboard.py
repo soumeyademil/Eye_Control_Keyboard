@@ -6,6 +6,8 @@ import imutils
 import dlib
 import cv2
 from utils import *
+import pyautogui
+import subprocess as sp
 
 
 # References :
@@ -109,31 +111,45 @@ def closed_eyes(eyes_shape, thresh=0.3):
 	else:
 		return False
 
+frame = np.array((0, ))
+
 
 
 if __name__ == "__main__":
-	# file_path = 'image.jpg'
-	# vs = cv2.VideoCapture(1)
-	vs = VideoStream(src=0).start()
-	sc = Screen()
-	s = 'abcdef'
-	i = 0
+
+	# Camera ID
+	cam = 1
+	# Start stream reader thread
+	vs = VideoStream(src=cam).start()
+	s = ALPHABET # From utils
+	i = 0 # To loop over alphabets
+	# Eye aspect ratio threshold
+	thresh = 0.25
+
 	try:
+		notepad = "notepad.exe"
+		file_name = "file.txt"
+		# Open text file to write
+		sub_process = sp.Popen([notepad, file_name])
 		while True:
-			# image = cv2.imread(file_path)
-			image = vs.read()
-			eyes_shape = eyes_detection(image)
-			# cv2.putText(image, s[i], (10, 50), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0, 0, 255), 2)
-			# cv2.imshow('Image', image)
-			# sleep(1)
-			if closed_eyes(eyes_shape):
-				print(s[i])
-			i += 1
-			# sleep(1)
+			# Show keyboard shot
+			image = cv2.imread(f'KeyBoard_Shots//{i+1}.png', 1)
+			cv2.imshow('Image', image)	
 			if cv2.waitKey(1) & 0xFF == ord('q'):
 				break
+			sleep(2)
+			# Get current frame
+			frame = vs.read()
+			# Detect eyes
+			eyes_shape = eyes_detection(frame)
+			# Check if caracter selected
+			if closed_eyes(eyes_shape, thresh):
+				# print(s[i])
+				pyautogui.write(s[i]) # , interval = 0.5)
+			i += 1
 			if i == len(s):
 				i = 0
 	finally:
 		vs.stop()
+		sub_process.terminate()
 
